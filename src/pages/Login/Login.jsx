@@ -1,15 +1,15 @@
 /* eslint-disable no-unused-vars */
 import { useContext } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { loadCaptchaEnginge, LoadCanvasTemplate, LoadCanvasTemplateNoReload, validateCaptcha } from 'react-simple-captcha';
 import { AuthCon } from '../../providers/AuthProv';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import Swal from 'sweetalert2';
 
 
 const Login = () => {
 
-    const captchaRef = useRef(null);
     const [disabled,setDisabled]=useState(true);
 
     const {signIn}=useContext(AuthCon);
@@ -29,12 +29,21 @@ const Login = () => {
         .then(result=>
           {
             const user=result.user;
+            Swal.fire({
+              title: 'User Login Successful.',
+              showClass: {
+                  popup: 'animate__animated animate__fadeInDown'
+              },
+              hideClass: {
+                  popup: 'animate__animated animate__fadeOutUp'
+              }
+          });
           })
     }
 
-    const handleValidateCaptcha = () =>
+    const handleValidateCaptcha = (e) =>
     {
-        const user_captcha_value=captchaRef.current.value;
+      const user_captcha_value = e.target.value;
         if(validateCaptcha(user_captcha_value))
         {
             setDisabled(false);
@@ -95,14 +104,14 @@ const Login = () => {
               <LoadCanvasTemplate />
               </label>
               <input
+              onBlur={handleValidateCaptcha}
                 type="text"
-                ref={captchaRef}
                 name="captcha"
                 placeholder="Type the captcha above"
                 className="input input-bordered"
                 required
               />
-              <button onClick={handleValidateCaptcha} className='btn btn-outline btn-xs mt-2'>Validate</button>
+        
             </div>
             <div className="form-control mt-6">
               <input disabled={disabled} className="btn btn-primary" type="submit" value="Login"/>
