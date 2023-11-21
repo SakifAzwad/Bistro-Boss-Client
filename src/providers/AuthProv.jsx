@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import {
   createUserWithEmailAndPassword,
-    getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut,
+    getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile,
   } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
 import { app } from "../firebase/firebase.config";
@@ -29,6 +29,12 @@ const AuthProv = ({children}) => {
       return signOut(auth);
     };
 
+    const updateUserProfile = (name, photo) => {
+      return updateProfile(auth.currentUser, {
+          displayName: name, photoURL: photo
+      });
+  }
+
     useEffect(() => {
       const unSubscribe = onAuthStateChanged(auth, (newUser) => {
         setUser(newUser);
@@ -39,7 +45,7 @@ const AuthProv = ({children}) => {
       };
     }, []);
 
-    const authInfo = { user,loading,createUser,signIn,logOut };
+    const authInfo = { user,loading,createUser,signIn,logOut,updateUserProfile };
     return <AuthCon.Provider value={authInfo}>{children}</AuthCon.Provider>;
 };
 
