@@ -1,10 +1,42 @@
+import { FaTrashAlt } from "react-icons/fa";
 import useCart from "../../../hooks/useCart";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import Swal from "sweetalert2";
 
 
 const Cart = () => {
 
-    const [cart ] = useCart();
-    const totalPrice = cart.reduce((total, item) => total + item.price, 0);
+    const [cart ,refetch] = useCart();
+    const total = cart.reduce((total, item) => total + item.price, 0);
+    const totalPrice=total.toPrecision(4);
+    const axiosSecure = useAxiosSecure();
+
+    const handleDelete = id => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                axiosSecure.delete(`/carts/${id}`)
+                    .then(res => {
+                        if (res.data.deletedCount > 0) {
+                            refetch();
+                            Swal.fire({
+                                title: "Deleted!",
+                                text: "Your file has been deleted.",
+                                icon: "success"
+                            });
+                        }
+                    })
+            }
+        });
+    }
 
     return (
         <div>
@@ -47,8 +79,10 @@ const Cart = () => {
                                 </td>
                                 <td>${item.price}</td>
                                 <th>
-                                    <button className="btn btn-primary">
-                                    Details
+                                <button
+                                        onClick={() => handleDelete(item._id)}
+                                        className="btn btn-ghost btn-lg">
+                                        <FaTrashAlt className="text-red-600"></FaTrashAlt>
                                     </button>
                                 </th>
                             </tr>)
