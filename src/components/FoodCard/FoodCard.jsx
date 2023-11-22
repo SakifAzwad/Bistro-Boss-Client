@@ -3,6 +3,7 @@
 import Swal from "sweetalert2";
 import useAuth from "../../hooks/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const FoodCard = ({ item }) => {
   const { image, price, name, recipe,_id } = item;
@@ -20,6 +21,22 @@ const FoodCard = ({ item }) => {
         image,
         price,
       };
+      axios.post('http://localhost:5000/carts', cartItem)
+      .then(res => {
+          console.log(res.data)
+          if (res.data.insertedId) {
+              Swal.fire({
+                  position: "top-end",
+                  icon: "success",
+                  title: `${name} added to your cart`,
+                  showConfirmButton: false,
+                  timer: 1500
+              });
+              // refetch cart to update the cart items count
+              
+          }
+
+      })
     }
     else{
       Swal.fire({
